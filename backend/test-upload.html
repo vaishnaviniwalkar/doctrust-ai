@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DocTrust Upload Test</title>
+</head>
+<body>
+
+    <h2>Test Document Upload</h2>
+
+    <input type="file" id="document" accept=".pdf,.jpg,.jpeg,.png">
+
+    <button type="button" onclick="uploadDocument()">Verify Document</button>
+
+    <pre id="result"></pre>
+
+    <script>
+    async function uploadDocument() {
+
+        const fileInput = document.getElementById("document");
+        const result = document.getElementById("result");
+
+        if (!fileInput.files.length) {
+            result.textContent = "Please select a document.";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("document", fileInput.files[0]);
+
+        result.textContent = "Uploading and processing...";
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:3000/api/verify",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+            const text = await response.text();
+
+            console.log("Server response:", text);
+
+            if (!response.ok) {
+                result.textContent =
+                    "Server Error:\n" + text;
+                return;
+            }
+
+            result.textContent = text;
+
+        } catch (error) {
+
+            console.error("Upload error:", error);
+
+            result.textContent =
+                "Connection Error:\n" + error.message;
+        }
+    }
+</script>
+</body>
+</html>
